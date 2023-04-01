@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "392883175184",
+    "project_id": "itec-t3nsa",
+    "storage_bucket": "itec-t3nsa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392883175184:android:2c00d70916707e48a72f95",
+        "android_client_info": {
+          "package_name": "com.example.itec_t3nsa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "392883175184-s9ep0urv917p56ons2ksdpeq3u70l8rp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBiBx1DUjlU9NWlomHOI34XRBcworrNKY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "392883175184-s9ep0urv917p56ons2ksdpeq3u70l8rp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "392883175184-kvdtgjqbdk9mk81u6396o70d5v5tlun9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.itecT3nsa"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -3,10 +3,10 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
-class DALLEImageEditorService {
+class DALLEImageEditorController {
   final String apiKey;
 
-  DALLEImageEditorService(this.apiKey);
+  DALLEImageEditorController(this.apiKey);
 
   Future<String> editImage(String description, String edits) async {
     Logger logger = Logger();
@@ -18,10 +18,11 @@ class DALLEImageEditorService {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $apiKey'
+          'Authorization':
+              'Bearer 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'
         },
         body: jsonEncode({
-          'prompt': "$description, 50 years ago",
+          'prompt': "$description 50 years ago",
           "n": 1,
           "size": "1024x1024",
         }),

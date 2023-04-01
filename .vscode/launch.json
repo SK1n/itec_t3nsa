@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "itec_t3nsa",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define",
+                "API_KEY=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",
+            ]
+        },
+        {
+            "name": "itec_t3nsa (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "itec_t3nsa (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

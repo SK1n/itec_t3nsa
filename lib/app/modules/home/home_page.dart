@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:google_ml_kit/google_ml_kit.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:itec_t3nsa/app/controllers/camera_controller.dart';
-import 'package:itec_t3nsa/app/controllers/firebase_vision.dart';
 import 'package:itec_t3nsa/app/controllers/landmark_detector_controller.dart';
 import 'package:itec_t3nsa/app/global_widgets/custom_scaffold.dart';
 import 'package:itec_t3nsa/app/routes/app_pages.dart';
@@ -14,8 +9,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final CamController cameraController = Get.find();
-    final FirebaseVisionController firebaseVisionController = Get.find();
     final LandmarkDetectorController landmarkDetectorController = Get.find();
     return CustomScaffold([
       SliverToBoxAdapter(
@@ -23,8 +16,9 @@ class HomePage extends StatelessWidget {
           children: [
             FilledButton(
               onPressed: () async {
-                String description =
+                String? description =
                     await landmarkDetectorController.getLandmark();
+                debugPrint(description!);
                 Get.toNamed(
                   Routes.resultsPage,
                   arguments: [
