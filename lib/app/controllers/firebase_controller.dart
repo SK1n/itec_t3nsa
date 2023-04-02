@@ -1,22 +1,69 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:itec_t3nsa/app/routes/app_pages.dart';
 
 class FirebaseController extends GetxController {
-  late FirebaseAuth _firebaseAuth;
+  isSignedIn() => FirebaseAuth.instance.currentUser != null;
 
-  Future<bool> isLoggedIn() async {
-    final user = FirebaseAuth.instance.currentUser;
-    return user != null;
+  Future<String?> uploadImageFromUrlToFirebaseStorage(String imageUrl) async {
+    try {
+      var response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode != 200) {
+        throw response;
+      }
+      final fileName = imageUrl.split('/').last;
+      final storageRef = FirebaseStorage.instance
+          .ref(FirebaseAuth.instance.currentUser!.uid)
+          .child(fileName);
+      final uploadTask = storageRef.putData(response.bodyBytes);
+      final snapshot = await uploadTask.whenComplete(() {});
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+      return downloadUrl;
+    } on Exception {
+      rethrow;
+    }
+  }
+
+  Future<List<String>> getArrayFromFirestore() async {
+    EasyLoading.show();
+
+    try {
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+
+      final data = docSnapshot.data();
+      final dynamic arrayData = data!['generatedImages'];
+      EasyLoading.dismiss();
+      return List<String>.from(arrayData);
+    } on Exception catch (e) {
+      EasyLoading.showError("Sorry we couldn't load the images");
+      return [];
+    }
+  }
+
+  Future<void> uploadDataToFirestore(String image) async {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final CollectionReference collection =
+          FirebaseFirestore.instance.collection('users');
+      final DocumentReference document = collection.doc(user.uid);
+      await document.update({
+        'generatedImages': FieldValue.arrayUnion([image])
+      });
+    }
   }
 
   Future<void> signInWithEmailAndPassword(String email, String password) async {
     try {
       EasyLoading.show();
-      UserCredential userCredential =
-          await _firebaseAuth.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -43,25 +90,20 @@ class FirebaseController extends GetxController {
       String email, String password) async {
     try {
       EasyLoading.show();
-      UserCredential userCredential = await _firebaseAuth
-          .createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      )
-          .then((user) async {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.user!.uid)
-            .set({"email": user.user!.email});
-
-        await signOut();
-
-        return user;
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+      debugPrint(userCredential.user!.uid);
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'email': userCredential.user!.email,
+        'createdAt': DateTime.now(),
+        'generatedImages': [],
       });
-      EasyLoading.showSuccess(
-          'Account created successfully for user ${userCredential.user!.email}.');
 
-      Get.back();
+      await signOut();
+      EasyLoading.showSuccess('Account created successfully.');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
         EasyLoading.showError(
@@ -74,7 +116,7 @@ class FirebaseController extends GetxController {
         EasyLoading.showError(
             'Error occurred while creating account: ${e.code}');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       EasyLoading.showError('Error occurred while creating account: $e');
     }
   }
@@ -83,16 +125,9 @@ class FirebaseController extends GetxController {
     try {
       EasyLoading.show();
       await FirebaseAuth.instance.signOut();
-      Get.toNamed(Routes.login);
       EasyLoading.dismiss();
     } catch (e) {
       EasyLoading.showError('Error signing out: $e');
     }
-  }
-
-  @override
-  void onInit() {
-    _firebaseAuth = FirebaseAuth.instance;
-    super.onInit();
   }
 }

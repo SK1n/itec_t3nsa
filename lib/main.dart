@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +18,10 @@ void main() async {
     GetMaterialApp(
       title: 'iTEC - T3nsa',
       builder: EasyLoading.init(),
+      debugShowCheckedModeBanner: false,
       getPages: AppPages.routes,
       initialRoute:
-          await firebaseController.isLoggedIn() ? Routes.home : Routes.login,
+          firebaseController.isSignedIn() ? Routes.home : Routes.login,
       initialBinding: AppBindings(),
       theme: FlexThemeData.light(
         scheme: FlexScheme.red,

@@ -11,6 +11,6 @@ class AppBindings implements Bindings {
       ..loadingStyle = EasyLoadingStyle.custom
       ..backgroundColor = Colors.white
       ..indicatorColor = Colors.pinkAccent
-      ..textColor = Colors.white;
+      ..textColor = Get.theme.primaryColor;
   }
 }

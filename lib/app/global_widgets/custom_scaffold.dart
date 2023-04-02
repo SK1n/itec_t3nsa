@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 class CustomScaffold extends StatelessWidget {
   final List<Widget> slivers;
   final String title;
-  const CustomScaffold(this.slivers, {super.key, required this.title});
+  final Widget? trailing;
+  const CustomScaffold(this.slivers,
+      {super.key, required this.title, this.trailing});
 
   @override
   Widget build(BuildContext context) {
@@ -11,6 +13,7 @@ class CustomScaffold extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
         centerTitle: true,
+        actions: [trailing ?? const SizedBox.shrink()],
       ),
       body: SafeArea(
         child: CustomScrollView(
