@@ -14,7 +14,7 @@ class DALLEImageEditorController extends GetxController {
   Future<List<dynamic>> editImage(String description) async {
     Logger logger = Logger();
 
-    String apiKey = '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';
+    String apiKey = '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';
 
     var images;
     try {

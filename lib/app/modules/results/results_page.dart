@@ -24,74 +24,92 @@ class ResultsPage extends StatelessWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: FutureBuilder(
-                future: dalle.editImage(description).timeout(
-                  const Duration(
-                    minutes: 5,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      description.replaceAll(
+                        ',',
+                        ' ',
+                      ),
+                    ),
                   ),
-                  onTimeout: () {
-                    EasyLoading.showError("We couldn't generate the images");
-                    Get.back();
-                    return [];
-                  },
                 ),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    List<dynamic> images = snapshot.data!;
-                    return ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Card(
-                          child: Column(
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  Get.toNamed(Routes.fullscreen,
-                                      arguments: [images[index]]);
-                                },
-                                child: Hero(
-                                  tag: images[index],
-                                  child: OctoImage(
-                                    image: CachedNetworkImageProvider(
-                                      images[index],
-                                    ),
-                                    errorBuilder:
-                                        OctoError.icon(color: Colors.red),
-                                    fit: BoxFit.cover,
-                                    width: Get.width,
-                                    height: 200,
-                                    progressIndicatorBuilder:
-                                        (context, progress) {
-                                      double value = 0;
-                                      if (progress != null &&
-                                          progress.expectedTotalBytes != null) {
-                                        value = progress.cumulativeBytesLoaded /
-                                            progress.expectedTotalBytes!
-                                                .toInt();
-                                      }
-                                      return Center(
-                                        child: SizedBox(
-                                          width: 14,
-                                          height: 14,
-                                          child: CircularProgressIndicator(
-                                              value: value),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
+                FutureBuilder(
+                    future: dalle.editImage(description).timeout(
+                      const Duration(
+                        minutes: 5,
+                      ),
+                      onTimeout: () {
+                        EasyLoading.showError(
+                            "We couldn't generate the images");
+                        Get.back();
+                        return [];
                       },
-                      itemCount: images.length,
-                      shrinkWrap: true,
-                    );
-                  } else {
-                    return Container();
-                  }
-                }),
+                    ),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        List<dynamic> images = snapshot.data!;
+                        return ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return Card(
+                              child: Column(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      Get.toNamed(Routes.fullscreen,
+                                          arguments: [images[index]]);
+                                    },
+                                    child: Hero(
+                                      tag: images[index],
+                                      child: OctoImage(
+                                        image: CachedNetworkImageProvider(
+                                          images[index],
+                                        ),
+                                        errorBuilder:
+                                            OctoError.icon(color: Colors.red),
+                                        fit: BoxFit.cover,
+                                        width: Get.width,
+                                        height: 200,
+                                        progressIndicatorBuilder:
+                                            (context, progress) {
+                                          double value = 0;
+                                          if (progress != null &&
+                                              progress.expectedTotalBytes !=
+                                                  null) {
+                                            value =
+                                                progress.cumulativeBytesLoaded /
+                                                    progress.expectedTotalBytes!
+                                                        .toInt();
+                                          }
+                                          return Center(
+                                            child: SizedBox(
+                                              width: 14,
+                                              height: 14,
+                                              child: CircularProgressIndicator(
+                                                  value: value),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          itemCount: images.length,
+                          shrinkWrap: true,
+                        );
+                      } else {
+                        return Container();
+                      }
+                    }),
+              ],
+            ),
           ),
         ),
       ],
