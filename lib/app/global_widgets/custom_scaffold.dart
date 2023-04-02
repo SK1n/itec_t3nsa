@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 
 class CustomScaffold extends StatelessWidget {
   final List<Widget> slivers;
-  const CustomScaffold(this.slivers, {super.key});
+  final String title;
+  const CustomScaffold(this.slivers, {super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: slivers,

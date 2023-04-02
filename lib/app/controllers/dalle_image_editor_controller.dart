@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
@@ -11,6 +10,8 @@ class DALLEImageEditorController {
   Future<String> editImage(String description, String edits) async {
     Logger logger = Logger();
 
+    String apiKey = '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';
+
     logger.d(description);
     try {
       var url = Uri.parse('https://api.openai.com/v1/images/generations');
@@ -18,8 +19,7 @@ class DALLEImageEditorController {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization':
-              'Bearer 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'
+          'Authorization': 'Bearer $apiKey'
         },
         body: jsonEncode({
           'prompt': "$description 50 years ago",
