@@ -21,24 +21,23 @@ class MapsController extends GetxController {
 
   Uri get searchUri {
     const api = "&key=${const String.fromEnvironment("GOOGLE_KEY")}";
-    final location =
-        "lcoation=${currentPosition.latitude},${currentPosition.longitude}}";
+    const location = "location=45.760696,21.226788";
     const rankBy = "&rankby=distance";
+    const type = "&type=landmark";
+    const radius = "&radius=5000000";
 
     final url =
-        Uri.parse(Strings.baseUrlNearBySearch + location + rankBy + api);
+        Uri.parse(Strings.baseUrlNearBySearch + location + radius + type + api);
     return url;
   }
 
   getPlaces() async {
     Logger logger = Logger();
     try {
-      logger.d('aaa');
       final response = await http.get(searchUri);
-      logger.d(response);
       final decodedResponse = await jsonDecode(response.body) as Map;
-
-      final results = await decodedResponse['results'] as List;
+      logger.d(decodedResponse);
+      final results = await decodedResponse['results'];
       logger.d(results);
     } catch (e) {}
   }
