@@ -2,7 +2,9 @@ import 'package:get/get.dart';
 import 'package:itec_t3nsa/app/bindings/dalle_image_editor_service_binding.dart';
 import 'package:itec_t3nsa/app/bindings/firebase_binding.dart';
 import 'package:itec_t3nsa/app/bindings/landmark_detector_binding.dart';
+import 'package:itec_t3nsa/app/bindings/maps_binding.dart';
 import 'package:itec_t3nsa/app/controllers/firebase_controller.dart';
+import 'package:itec_t3nsa/app/controllers/maps_controller.dart';
 import 'package:itec_t3nsa/app/modules/create_account/create_account_page.dart';
 import 'package:itec_t3nsa/app/modules/fullscreen/fullscreen_page.dart';
 import 'package:itec_t3nsa/app/modules/gallery/gallery_page.dart';
@@ -23,6 +25,7 @@ class AppPages {
       page: () => const HomePage(),
       bindings: [
         LandmarkDetectorBinding(),
+        MapsBinding(),
       ],
       children: [
         GetPage(

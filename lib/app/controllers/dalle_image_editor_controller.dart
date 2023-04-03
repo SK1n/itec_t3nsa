@@ -14,7 +14,7 @@ class DALLEImageEditorController extends GetxController {
   Future<List<dynamic>> editImage(String description) async {
     Logger logger = Logger();
 
-    String apiKey = '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';
+    String apiKey = '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';
 
     var images;
     try {
@@ -29,7 +29,7 @@ class DALLEImageEditorController extends GetxController {
         body: jsonEncode({
           'prompt': "$description made 50 years ago, Aged ",
           "n": 4,
-          "size": "512x512",
+          "size": "256x256",
         }),
       );
 
