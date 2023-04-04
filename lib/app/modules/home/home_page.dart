@@ -8,7 +8,7 @@ import 'package:itec_t3nsa/app/controllers/firebase_controller.dart';
 import 'package:itec_t3nsa/app/controllers/landmark_detector_controller.dart';
 import 'package:itec_t3nsa/app/controllers/maps_controller.dart';
 import 'package:itec_t3nsa/app/routes/app_pages.dart';
-
+   
 class HomePage extends GetView<MapsController> {
   const HomePage({super.key});
 
