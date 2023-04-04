@@ -28,14 +28,10 @@ class MainActivity: FlutterActivity() {
             if(call.method.equals("getLandmarks")) {
                 try {
                     val hashMap = call.arguments as HashMap<*,*>
-                    val path = hashMap["image"]
-                   // result.success(path)
-                    Log.d("path", path.toString())
                     GlobalScope.launch {
                         val response = getLandmarks(path as String)
                         Log.d("response", response.toString())
                         var tags : String= ""
-
                         for(tag in response) {
                             tags += "${tag.landmark},"
                         }
@@ -55,13 +51,6 @@ class MainActivity: FlutterActivity() {
     private suspend fun getLandmarks(image2: String) : List<FirebaseVisionCloudLandmark> {
         var image: FirebaseVisionImage
         var landmarkDescription: String = ""
-//        val metadata = FirebaseVisionImageMetadata.Builder()
-//            .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
-//            .setWidth(0)
-//            .setHeight(0)
-//            .setRotation(FirebaseVisionImageMetadata.ROTATION_0)
-//            // Set other optional properties here
-//            .build()
         val bitmap = BitmapFactory.decodeFile(image2)
                 image = FirebaseVisionImage.fromBitmap(bitmap)
 
