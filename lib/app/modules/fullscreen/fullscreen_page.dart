@@ -9,9 +9,9 @@ class FullScreenPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String imageUrl = Get.arguments[0];
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
+    return InkWell(
+      onTap: () => Get.back(),
+      child: Center(
         child: Hero(
           tag: imageUrl,
           child: OctoImage(

@@ -1,57 +1,105 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:itec_t3nsa/app/controllers/dalle_image_editor_controller.dart';
 import 'package:itec_t3nsa/app/core/values/strings.dart';
-import 'package:itec_t3nsa/app/data/enums/nearby_model.dart';
+import 'package:itec_t3nsa/app/data/enums/landmarks_model.dart';
+import 'package:itec_t3nsa/app/data/enums/landmarks_results_model.dart';
+import 'package:itec_t3nsa/app/routes/app_pages.dart';
 import 'package:logger/logger.dart';
 
 class MapsController extends GetxController {
-  CameraPosition cameraPosition = const CameraPosition(
-    target: LatLng(45.760696, 21.226788),
-    zoom: 13,
-  );
-  late Position currentPosition;
+  final DALLEImageEditorController dalle =
+      Get.put(DALLEImageEditorController());
 
-  final Completer<GoogleMapController> googleMapController =
-      Completer<GoogleMapController>();
+  final markers = <Marker>{}.obs;
 
-  Uri get searchUri {
+  late GoogleMapController mapController;
+
+  late Position position;
+
+  void onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+
+    getPlaces();
+  }
+
+  Future<Uri> get searchUri async {
+    Position currentPosition = await determinePosition();
     const api = "&key=${const String.fromEnvironment("GOOGLE_KEY")}";
-    const location = "location=45.760696,21.226788";
-    const rankBy = "&rankby=distance";
-    const type = "&type=landmark";
-    const radius = "&radius=5000000";
+    String location =
+        "location=${currentPosition.latitude},${currentPosition.longitude}";
+    const type = "&type=tourist_attraction";
+    const radius = "&radius=5000";
 
     final url =
         Uri.parse(Strings.baseUrlNearBySearch + location + radius + type + api);
+    debugPrint(url.toString());
     return url;
   }
 
   getPlaces() async {
     Logger logger = Logger();
-    try {
-      final response = await http.get(searchUri);
-      final decodedResponse = await jsonDecode(response.body) as Map;
-      logger.d(decodedResponse);
-      final results = await decodedResponse['results'];
-      logger.d(results);
-    } catch (e) {}
+    final response = await http.get(await searchUri);
+    final LandmarksModel landmarksModel =
+        LandmarksModel.fromJson(await jsonDecode(response.body));
+    final List<LandmarksResultsModel> results = landmarksModel.results!;
+    markers.value.clear();
+
+    logger.d(await jsonDecode(response.body));
+
+    markers.value = results
+        .map(
+          (element) => Marker(
+            markerId: MarkerId(
+              element.placeId ?? Random().nextInt(1333).toString(),
+            ),
+            position: LatLng(
+              element.geometry!.location!.lat!,
+              element.geometry!.location!.lng!,
+            ),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueAzure,
+            ),
+            onTap: () async {
+              double lat = element.geometry!.location!.lat!;
+              double lng = element.geometry!.location!.lng!;
+              final placemarks = await placemarkFromCoordinates(lat, lng);
+              Get.defaultDialog(
+                title: "Do you want to generate images for ${element.name}?",
+                middleText: "",
+                onCancel: () {},
+                onConfirm: () async {
+                  Get.close(1);
+                  Get.toNamed(
+                    Routes.resultsPage,
+                    arguments: [
+                      "${element.name}",
+                      ",from ${placemarks.first.locality}",
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        )
+        .toSet();
+    logger.d("${markers.first.position}");
+    // logger.d(markers);
   }
 
-  Future<Position> _determinePosition() async {
+  Future<Position> determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
       return Future.error('Location services are disabled.');
     }
 
@@ -59,37 +107,33 @@ class MapsController extends GetxController {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
         return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
     return await Geolocator.getCurrentPosition();
+  }
+
+  getCurrentCameraPosition() async {
+    position = await determinePosition();
+    return CameraPosition(
+      target: LatLng(
+        position.latitude,
+        position.longitude,
+      ),
+      zoom: 13,
+    );
   }
 
   @override
   void onReady() async {
-    currentPosition = await _determinePosition();
-    cameraPosition = CameraPosition(
-      target: LatLng(
-        currentPosition.latitude,
-        currentPosition.longitude,
-      ),
-      zoom: 13,
-    );
-    await getPlaces();
+    await setCurrentLocation();
     super.onReady();
   }
+
+  setCurrentLocation() async {}
 }

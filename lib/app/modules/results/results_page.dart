@@ -8,6 +8,7 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:itec_t3nsa/app/controllers/dalle_image_editor_controller.dart';
 import 'package:itec_t3nsa/app/controllers/firebase_controller.dart';
 import 'package:itec_t3nsa/app/global_widgets/custom_scaffold.dart';
+import 'package:itec_t3nsa/app/modules/results/landmark_tag.dart';
 import 'package:itec_t3nsa/app/routes/app_pages.dart';
 import 'package:octo_image/octo_image.dart';
 
@@ -18,41 +19,31 @@ class ResultsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final DALLEImageEditorController dalle = Get.find();
     final String description = Get.arguments[0];
+    final String? nearestCity = Get.arguments[1];
     final FirebaseController firebaseController = Get.find();
     return CustomScaffold(
       [
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      description.replaceAll(
-                        ',',
-                        ' ',
-                      ),
-                    ),
+            child: FutureBuilder(
+                future: dalle.editImage(description, city: nearestCity).timeout(
+                  const Duration(
+                    minutes: 5,
                   ),
+                  onTimeout: () {
+                    EasyLoading.showError("We couldn't generate the images");
+                    Get.back();
+                    return [];
+                  },
                 ),
-                FutureBuilder(
-                    future: dalle.editImage(description).timeout(
-                      const Duration(
-                        minutes: 5,
-                      ),
-                      onTimeout: () {
-                        EasyLoading.showError(
-                            "We couldn't generate the images");
-                        Get.back();
-                        return [];
-                      },
-                    ),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        List<dynamic> images = snapshot.data!;
-                        return ListView.builder(
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    List<dynamic> images = snapshot.data!;
+                    return Column(
+                      children: [
+                        landmarkTags(description, city: nearestCity),
+                        ListView.builder(
                           physics: const NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
                             return Card(
@@ -103,13 +94,13 @@ class ResultsPage extends StatelessWidget {
                           },
                           itemCount: images.length,
                           shrinkWrap: true,
-                        );
-                      } else {
-                        return Container();
-                      }
-                    }),
-              ],
-            ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Container();
+                  }
+                }),
           ),
         ),
       ],
