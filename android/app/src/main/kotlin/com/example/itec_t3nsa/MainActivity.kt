@@ -28,6 +28,7 @@ class MainActivity: FlutterActivity() {
             if(call.method.equals("getLandmarks")) {
                 try {
                     val hashMap = call.arguments as HashMap<*,*>
+                    val path = hashMap["image"]
                     GlobalScope.launch {
                         val response = getLandmarks(path as String)
                         Log.d("response", response.toString())
